@@ -1,0 +1,48 @@
+#+title: CodeQL Dataflow SQL Injection (Go)
+
+* Intro
+  - Minimal Go example to demonstrate taint flow: untrusted input from =stdin= flows into a dynamically constructed SQL string and is executed via =exec.Command("sqlite3", ...)=.
+  - Two CodeQL queries are included:
+    - =SourceGetUserInfo.ql=: matches the return value of =getUserInfo()= as a taint source.
+    - =SinkExecCommandThirdArg.ql=: matches the 3rd argument of =exec.Command(...)= as a taint sink.
+
+* Build a CodeQL database
+  Assumes Go toolchain and CodeQL CLI are installed and on PATH.
+
+  #+begin_src shell
+    cd codeql/codeql-dataflow-sql-injection-go
+
+    # Optional: fetch deps if any
+    go mod init example.com/adduser 2>/dev/null || true
+    go mod tidy 2>/dev/null || true
+
+    # Create the CodeQL database (Go extractor auto-detected)
+    codeql database create db --language=go --source-root .
+  #+end_src
+
+  If you already have a database, you can skip creation and reuse it.
+
+* Run the queries
+  First, install the pack dependencies, then analyze the database with this pack.
+
+  #+begin_src shell
+    cd codeql/codeql-dataflow-sql-injection-go
+
+    # Install dependencies for the pack
+    codeql pack install
+
+    # Run both queries in this directory against the database
+    codeql database analyze db . \
+           --format=sarifv2.1.0 \
+           --output=results.sarif
+  #+end_src
+
+  To run a single query:
+
+  #+begin_src shell
+    codeql database analyze db SourceGetUserInfo.ql --format=text
+    codeql database analyze db SinkExecCommandThirdArg.ql --format=text
+  #+end_src
+
+* Notes
+  - The queries use AST matching (not dataflow) to demonstrate precise source/sink identification. You can wire them into a taint configuration to perform full dataflow analysis.
