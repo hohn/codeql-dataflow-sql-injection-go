@@ -2,7 +2,7 @@ name: hohnlab/codeql-dataflow-sql-injection-go
 version: 0.0.1
 extractor: go
 dependencies:
-  codeql/go: "*"
+  codeql/go-all: "*"
 queries:
   - SourceGetUserInfo.ql
   - SinkExecCommandThirdArg.ql

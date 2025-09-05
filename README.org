@@ -17,7 +17,8 @@
     go mod tidy 2>/dev/null || true
 
     # Create the CodeQL database (Go extractor auto-detected)
-    codeql database create db --language=go --source-root .
+    codeql database create db.4b6900 --language=go --command=./build.sh 
+
   #+end_src
 
   If you already have a database, you can skip creation and reuse it.
@@ -32,7 +33,7 @@
     codeql pack install
 
     # Run both queries in this directory against the database
-    codeql database analyze db . \
+    codeql database analyze db.4b6900 . \
            --format=sarifv2.1.0 \
            --output=results.sarif
   #+end_src
@@ -41,7 +42,10 @@
 
   #+begin_src shell
     codeql database analyze db SourceGetUserInfo.ql --format=text
-    codeql database analyze db SinkExecCommandThirdArg.ql --format=text
+    codeql database analyze db.4b6900 \
+           SinkExecCommandThirdArg.ql \
+           --format=sarifv2.1.0 \
+           --output=SinkExecCommandThirdArg.sarif
   #+end_src
 
 * Notes
