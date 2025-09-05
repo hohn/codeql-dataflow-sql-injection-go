@@ -4,17 +4,8 @@
  */
 
 import go
+import DataFlow as DF
 
-/** A source expression corresponding to the value returned from getUserInfo. */
-predicate isSource(Expr e) {
-  exists(Function f, ReturnStmt r, int i |
-    f.getName() = "getUserInfo" and
-    r.getEnclosingFunction() = f and
-    e = r.getExpr(i)
-  )
-}
-
-from Expr e
-where isSource(e)
-select e, "Source: return value of getUserInfo"
-
+from DF::CallNode cn
+where cn.getACalleeIncludingExternals().getName() = "ReadString"
+select cn
